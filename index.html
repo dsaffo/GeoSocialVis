@@ -1,59 +1,44 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<style>
-    .links line {
-        stroke: #999;
-        stroke-opacity: 0.2;
-    }
-    .nodes circle {
-        stroke: #fff;
-        stroke-width: 1px;
-    }
-    .slidecontainer {
-        position: absolute;
-        top: 130px;
-        left: 600px;
-        background: #fff;
-        padding: 5pt 10pt;
-        box-shadow: #ccc 0 0 5px;
-        border-radius: 5px;
-    }
-    #map-background {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -10;
-        background: url('./map.png') 6px 6px no-repeat;
-    }
-</style>
-<div id="map-background"></div>
-<svg width="1800" height="900"></svg>
+<html lang="en">
+<head>
+    <title>ResearchAtlas</title>
+    <meta charset="utf-8" />
+    <link href="styles.css" rel="stylesheet" />
+</head>
+<body>
+    <div id="map-background"></div>
+    <svg width="1800" height="900"></svg>
 
-<div class="slidecontainer">
-    Authorship <input type="range" min="0" max="1" value="0.8" class="slider" id="myRange" step="0.02" /> Map
-</div>
+    <div class="slidecontainer">
+        Authorship <input type="range" min="0" max="1" value="0.8" class="slider" id="myRange" step="0.02" /> Map
+    </div>
 
-<script src="https://d3js.org/d3.v4.min.js"></script>
-<!--<script src="./node_modules/ssvg/dist/ssvg.js"></script>-->
-<!--<script src="VisAuthors10.json"></script>-->
-<!--<script src="https://measure-fps.surge.sh/measureFPS.js"></script>-->
-<!--<script src="/node_modules/ssvg/dist/ssvg.js"></script>-->
-<script src="data/affiliationList.js"></script>
-<script src="data/authorGraph.js"></script>
+    <div class="panel">
+        Panel
+    </div>
 
-<script>
-    /*if(window.location.search) {
-        new SSVG({
-            getFps: function(fps) {
-                const fpsElement = document.getElementById("fps-element");
-                fpsElement.innerHTML = fps;
-                //console.log(fps);
-            }
-        });
-    }*/
-</script>
-<script src="force-definitions.js"></script>
-<script src="force-balance.js"></script>
-<script src="main.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <!--<script src="./node_modules/ssvg/dist/ssvg.js"></script>-->
+    <!--<script src="VisAuthors10.json"></script>-->
+    <!--<script src="https://measure-fps.surge.sh/measureFPS.js"></script>-->
+    <!--<script src="/node_modules/ssvg/dist/ssvg.js"></script>-->
+    <script src="data/affiliationList.js"></script>
+    <script src="data/authorGraph.js"></script>
+
+    <script>
+        /*if(window.location.search) {
+            new SSVG({
+                getFps: function(fps) {
+                    const fpsElement = document.getElementById("fps-element");
+                    fpsElement.innerHTML = fps;
+                    //console.log(fps);
+                }
+            });
+        }*/
+    </script>
+    <script src="force-definitions.js"></script>
+    <script src="force-balance.js"></script>
+    <script src="main.js"></script>
+    <script src="panel.js"></script>
+</body>
+</html>
