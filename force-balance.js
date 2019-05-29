@@ -1,5 +1,5 @@
 const ForceBalance = (function(projection){
-    var svg = d3.select("svg"),
+    const svg = d3.select("svg"),
         width = +svg.attr("width"),
         height = +svg.attr("height");
 
@@ -35,8 +35,8 @@ const ForceBalance = (function(projection){
         }
     }
 
-    var slider = document.getElementById("myRange");
-    var forceSettings = forceSelection(slider.value);
+    const slider = document.getElementById("myRange");
+    let forceSettings = forceSelection(slider.value);
     let previousSliderValue = slider.value;
 
     slider.oninput = function() {
@@ -51,7 +51,7 @@ const ForceBalance = (function(projection){
         document.getElementById('map-background').style.opacity = forceSettings.mapOpacity;
     };
 
-    var simulation = d3.forceSimulation().alphaDecay(0.02);
+    const  simulation = d3.forceSimulation().alphaDecay(0.02);
 
     const forceLink = d3.forceLink().id(function(d) { return d.id; });
     const forceManyBody = d3.forceManyBody();

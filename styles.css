@@ -3,7 +3,7 @@
     stroke-opacity: 0.2;
 }
 .nodes circle {
-    stroke: #fff;
+    /*stroke: #fff;*/
     stroke-width: 1px;
 }
 .slidecontainer {

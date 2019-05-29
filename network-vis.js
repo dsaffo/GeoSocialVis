@@ -1,4 +1,4 @@
-const NetworkVis = (function(projection) {
+const NetworkVis = (function(dispatch, projection) {
     const svg = d3.select("svg"),
         width = +svg.attr("width"),
         height = +svg.attr("height");
@@ -6,7 +6,18 @@ const NetworkVis = (function(projection) {
     const forceBalance = ForceBalance(projection);
     const simulation = forceBalance.simulation;
 
-    var path = d3.geoPath().projection(projection);
+    let highlightedAuthor = null;
+
+    dispatch.on('authorUnhighlighted.networkVis', function() {
+        highlightedAuthor = null;
+        redraw();
+    });
+    dispatch.on('authorHighlighted.networkVis', function(author) {
+        highlightedAuthor = author;
+        redraw();
+    });
+
+    const path = d3.geoPath().projection(projection);
 
     const affiliationsWithLocation = affiliations
         .filter(a => a.Position);
@@ -26,7 +37,7 @@ const NetworkVis = (function(projection) {
         .data(affiliationsWithLocation)
         .enter().append('circle');
 
-    var color = d3.scaleOrdinal(d3.schemeCategory20);
+    const color = d3.scaleOrdinal(d3.schemeCategory20);
 
     for(const node of graph.nodes) {
         const match = affiliationsWithLocation.filter(a => a.Name === node.affiliation);
@@ -40,17 +51,17 @@ const NetworkVis = (function(projection) {
 
     graph.nodes.sort((a,b) => a.paperIndex.length - b.paperIndex.length);
 
-    var link = svg.append("g")
+    const link = svg.append("g")
         .attr("class", "links")
         .selectAll("line")
         .data(graph.links)
         .enter().append("line")
         .attr("stroke-width", function(d) { return Math.sqrt(d.value); });
 
-    var nodesG = svg.append("g")
+    const nodesG = svg.append("g")
         .attr("class", "nodes");
 
-    var node = nodesG
+    const node = nodesG
         .selectAll("circle")
         .data(graph.nodes)
         .enter().append("circle")
@@ -62,6 +73,12 @@ const NetworkVis = (function(projection) {
             }
             const name = affiliation.NameSimple ? affiliation.NameSimple : d.affiliation;
             return color(name);
+        })
+        .on('mouseover', function(author) {
+            dispatch.call('authorHighlighted', this, author);
+        })
+        .on('mouseout', function(author) {
+            dispatch.call('authorUnhighlighted', this);
         })
         .call(d3.drag()
             .on("start", dragstarted)
@@ -85,11 +102,11 @@ const NetworkVis = (function(projection) {
 
     simulation
         .nodes(graph.nodes)
-        .on("tick", ticked);
+        .on("tick", redraw);
     simulation.force("link")
         .links(graph.links);
 
-    function ticked() {
+    function redraw() {
         link
             .attr("x1", function(d) { return d.source.x; })
             .attr("y1", function(d) { return d.source.y; })
@@ -98,7 +115,15 @@ const NetworkVis = (function(projection) {
 
         nodesG.selectAll('circle')
             .attr('cx', d => d.x)
-            .attr('cy', d => d.y);
+            .attr('cy', d => d.y)
+            .attr('stroke', d => {
+                if(!highlightedAuthor) return '#ffffff';
+
+                if(d.id === highlightedAuthor.id) {
+                    return 'red';
+                }
+                return '#ccc';
+            });
 
         graph.nodes.forEach(d => {
             if(d.textEl) {
