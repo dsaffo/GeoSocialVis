@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.4.4/fuse.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+
+
+<body>
+  <div id="papers">
+
+
+    <div>
+      <input id="searchbar" placeholder="Search the site...">
+      <button id="searchB">Search</button>
+    </div>
+
+
+    <ul class="list"></ul>
+
+  </div>
+
+</body>
+
+<script>
+  search = document.getElementById("searchbar");
+  searchB = document.getElementById("searchB");
+
+
+  var searchOptions = {
+    shouldSort: true,
+    threshold: 0.1,
+    tokenize: true,
+    location: 0,
+    distance: 100,
+    maxPatternLength: 32,
+    minMatchCharLength: 1,
+    keys: [
+      "Title",
+      "AuthorNames-Deduped",
+      "Abstract",
+      "AuthorKeywords"
+    ]
+  };
+
+
+  var listOptions = {
+    valueNames: ['Title', 'AuthorNames-Deduped'],
+    // Since there are no elements in the list, this will be used as template.
+    item: '<li><h3 class="Title"></h3><p class="AuthorNames-Deduped"></p></li>'
+  };
+
+
+  d3.json('data/paperData.json', function(data) {
+    console.log(data);
+
+    var fuse = new Fuse(data, searchOptions);
+
+    var paperList = new List('papers', listOptions, []);
+
+    searchB.onclick = function() {
+      paperList.clear();
+      var result = fuse.search(search.value);
+      //var res = [];
+      //for (i=0; i < result.length; i++){
+      //  res.push(result[i].item);
+      //}  
+      paperList.add(result);
+    }
+  });
+
+</script>
