@@ -33,7 +33,55 @@
     right: 20px;
     top: 20px;
     height: calc(100% - 40px);
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 10px;
     box-sizing: border-box;
+}
+
+#searchBar {
+  width: 100%; 
+  font-size: 16px; 
+  padding: 12px 0px 12px 0px; 
+  border: 1px solid #ddd; 
+  margin-bottom: 12px; 
+  border-radius: 8px;
+}
+
+div.tooltip {	
+    position: absolute;			
+    text-align: center;			
+    width: auto;					
+    height: auto;					
+    padding: 5px;				
+    font: 12px sans-serif;		
+    background: rgba( 0, 0, 0, 0.727 );
+    color: whitesmoke;
+    border: 0px;		
+    border-radius: 8px;			
+    pointer-events: none;			
+}
+
+#papers {
+  font-size: 12px;
+  overflow:hidden; 
+  overflow-y:scroll;
+  height: calc(100% - 60px);
+}
+
+#papers::-webkit-scrollbar-track
+{
+    
+    background-color: rgba( 89, 89, 89, 0.05 );
+}
+
+#papers::-webkit-scrollbar
+{
+    width: 10px;
+    background-color: #F5F5F5;
+}
+
+#papers::-webkit-scrollbar-thumb
+{
+    background-color: #000000;
+
 }

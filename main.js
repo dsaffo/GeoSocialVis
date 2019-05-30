@@ -11,4 +11,13 @@
 
     const networkVis = NetworkVis(dispatch, projection);
     const panel = Panel(dispatch);
+  
+  
+    $(function() {
+    var $target = $('#papers');
+    $("body").mousewheel(function(event, delta) {
+      $target.scrollTop($target.scrollTop() - (delta * 30));
+      event.preventDefault();
+   });
+});
 })();

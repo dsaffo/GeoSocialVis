@@ -60,7 +60,8 @@
 
     var paperList = new List('papers', listOptions, []);
 
-    searchB.onclick = function() {
+    search.onkeyup = function() {
+      console.log('hi')
       paperList.clear();
       var result = fuse.search(search.value);
       //var res = [];

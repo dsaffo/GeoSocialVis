@@ -6,44 +6,59 @@ const NetworkVis = (function (dispatch, projection) {
   const forceBalance = ForceBalance(projection);
   const simulation = forceBalance.simulation;
 
+  var div = d3.select("body").append("div")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
   let highlightedAuthor = null;
   let selectedNodes = [];
   let selectedEdges = [];
 
   dispatch.on('authorUnhighlighted.networkVis', function () {
+    div.transition()
+      .duration(100)
+      .style("opacity", 0);
+
     highlightedAuthor = null;
     selectedNodes = [];
     selectedEdges = [];
     redraw();
   });
-  
+
   dispatch.on('authorHighlighted.networkVis', function (d) {
-    
+
+    div.transition()
+      .duration(100)
+      .style("opacity", 1);
+    div.html(d.id + "</br>" + d.affiliation)
+      .style("left", (d3.event.pageX + 20) + "px")
+      .style("top", (d3.event.pageY - 88) + "px");
+
     var names = [];
-    
+
     highlightedAuthor = d;
     selectedNodes.push(d);
-    
-    for (i=0; i < graph.links.length; i++){
-      if (graph.links[i].source.id == d.id){
+
+    for (i = 0; i < graph.links.length; i++) {
+      if (graph.links[i].source.id == d.id) {
         selectedEdges.push(graph.links[i])
         names.push(graph.links[i].target.id)
       }
-      if (graph.links[i].target.id == d.id){
+      if (graph.links[i].target.id == d.id) {
         selectedEdges.push(graph.links[i])
         names.push(graph.links[i].source.id)
       }
     }
-    
-    for (i=0; i < graph.nodes.length; i++){
-      if (names.indexOf(graph.nodes[i].id) >= 0){
+
+    for (i = 0; i < graph.nodes.length; i++) {
+      if (names.indexOf(graph.nodes[i].id) >= 0) {
         selectedNodes.push(graph.nodes[i])
       }
     }
-    
+
     //console.log(selectedNodes)
     //console.log(selectedEdges)
-    
+
     redraw();
   });
 
@@ -155,27 +170,23 @@ const NetworkVis = (function (dispatch, projection) {
       .attr("y2", function (d) {
         return d.target.y;
       });
-    
+
     link
-      .attr('stroke', d=>{
-        if (selectedEdges == 0){
+      .attr('stroke', d => {
+        if (selectedEdges == 0) {
           return '#999'
-        }
-        else if (selectedEdges.indexOf(d) >= 0){
+        } else if (selectedEdges.indexOf(d) >= 0) {
           return '#4f4544'
-        }
-        else {
+        } else {
           return '#999'
         }
       })
-      .attr('stroke-opacity', d=>{
-        if (selectedEdges == 0){
+      .attr('stroke-opacity', d => {
+        if (selectedEdges == 0) {
           return 0.2
-        }
-        else if (selectedEdges.indexOf(d) >= 0){
+        } else if (selectedEdges.indexOf(d) >= 0) {
           return 0.6
-        }
-        else {
+        } else {
           return 0.0
         }
       });
@@ -183,7 +194,7 @@ const NetworkVis = (function (dispatch, projection) {
     nodesG.selectAll('circle')
       .attr('cx', d => d.x)
       .attr('cy', d => d.y)
-    .transition().duration(100)
+      .transition().duration(100)
       .attr('stroke', d => {
         if (!highlightedAuthor) return '#fff';
 
@@ -193,22 +204,29 @@ const NetworkVis = (function (dispatch, projection) {
         return '#ccc';
       })
       .attr('opacity', d => {
-        if (selectedNodes.length == 0){
+        if (selectedNodes.length == 0) {
           return 1;
-        }
-        else if (selectedNodes.indexOf(d) >= 0){
-          return 1;  
-        }
-        else {
+        } else if (selectedNodes.indexOf(d) >= 0) {
+          return 1;
+        } else {
           return 0.1;
         }
-    });
+      });
 
     graph.nodes.forEach(d => {
       if (d.textEl) {
         d.textEl
           .attr('x', d.x)
-          .attr('y', d.y);
+          .attr('y', d.y)
+          .attr('opacity', function () {
+            if (selectedNodes.length == 0) {
+              return 1;
+            } else if (selectedNodes.indexOf(d) >= 0) {
+              return 1;
+            } else {
+              return 0.1;
+            }
+          });
       }
     });
   }

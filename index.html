@@ -1,32 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>ResearchAtlas</title>
-    <meta charset="utf-8" />
-    <link href="styles.css" rel="stylesheet" />
+  <title>ResearchAtlas</title>
+  <meta charset="utf-8" />
+  <link href="styles.css" rel="stylesheet" />
 </head>
+
 <body>
-    <div id="map-background"></div>
-    <svg width="1800" height="900"></svg>
+  <div id="map-background"></div>
+  <svg width="1800" height="900"></svg>
 
-    <div class="slidecontainer">
-        Authorship <input type="range" min="0" max="1" value="0.8" class="slider" id="myRange" step="0.02" /> Map
+  
+  <div class="panel">
+    <input type="text" id="searchBar" placeholder="Search for papers..">
+    <div id="papers">
+
+      <ul class="list"></ul>
+
     </div>
 
-    <div class="panel">
-        Panel
-    </div>
+  </div>
 
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-    <!--<script src="./node_modules/ssvg/dist/ssvg.js"></script>-->
-    <!--<script src="VisAuthors10.json"></script>-->
-    <!--<script src="https://measure-fps.surge.sh/measureFPS.js"></script>-->
-    <!--<script src="/node_modules/ssvg/dist/ssvg.js"></script>-->
-    <script src="data/affiliationList.js"></script>
-    <script src="data/authorGraph.js"></script>
+  
+  <div class="slidecontainer">
+    Authorship <input type="range" min="0" max="1" value="0.8" class="slider" id="myRange" step="0.02" /> Map
+  </div>
 
-    <script>
-        /*if(window.location.search) {
+  
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <!--<script src="./node_modules/ssvg/dist/ssvg.js"></script>-->
+  <!--<script src="VisAuthors10.json"></script>-->
+  <!--<script src="https://measure-fps.surge.sh/measureFPS.js"></script>-->
+  <!--<script src="/node_modules/ssvg/dist/ssvg.js"></script>-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/3.4.4/fuse.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/list.js/1.5.0/list.min.js"></script>
+  <script src="mouse.min.js"></script>
+  <script src="data/affiliationList.js"></script>
+  <script src="data/authorGraph.js"></script>
+  <script src="data/paperData.js"></script>
+
+  <script>
+    /*if(window.location.search) {
             new SSVG({
                 getFps: function(fps) {
                     const fpsElement = document.getElementById("fps-element");
@@ -35,11 +50,10 @@
                 }
             });
         }*/
-    </script>
-    <script src="force-definitions.js"></script>
-    <script src="force-balance.js"></script>
-    <script src="network-vis.js"></script>
-    <script src="panel.js"></script>
-    <script src="main.js"></script>
-</body>
-</html>
+  </script>
+  <script src="force-definitions.js"></script>
+  <script src="force-balance.js"></script>
+  <script src="network-vis.js"></script>
+  <script src="panel.js"></script>
+  <script src="main.js"></script>
+</body></html>
