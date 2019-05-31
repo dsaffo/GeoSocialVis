@@ -7,7 +7,7 @@
         .scale(250)
         .translate( [width / 2 - 50, height / 1.5]);
 
-    const dispatch = d3.dispatch("authorHighlighted", "authorUnhighlighted", "paperHighlighted", "authorClicked", "authorUnClicked");
+    const dispatch = d3.dispatch("authorHighlighted", "authorUnhighlighted", "paperHighlighted", "authorClicked", "authorUnClicked", "search");
 
     const networkVis = NetworkVis(dispatch, projection);
     const panel = Panel(dispatch);

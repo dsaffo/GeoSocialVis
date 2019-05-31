@@ -11,24 +11,91 @@ const NetworkVis = (function (dispatch, projection) {
     .style("opacity", 0);
 
   let highlightedAuthor = null;
-  let clickedAuthor = null;
-  let selectedNodes = [];
-  let selectedEdges = [];
-  let clickedNodes = [];
-  let clickedEdges = [];
 
-  dispatch.on('authorUnhighlighted.networkVis', function () {
+
+  let selections = {
+    highlightedAuthor: null,
+    clickedNodes: [],
+    clickedEdges: [],
+    hoveredNodes: [],
+    hoveredEdges: [],
+    search: '',
+    searchResults: []
+  }
+
+
+  var searchOptions = {
+    shouldSort: true,
+    threshold: 0.1,
+    tokenize: true,
+    location: 0,
+    distance: 100,
+    maxPatternLength: 32,
+    minMatchCharLength: 1,
+    keys: [
+      "Title",
+      "AuthorNames-Deduped",
+      "Abstract",
+      "AuthorKeywords"
+    ]
+  };
+
+  var fuse = new Fuse(allPapers, searchOptions);
+
+  dispatch.on('search.networkVis', function (selections) {
+    selections.highlightedAuthor = null;
+    selections.clickedNodes = [];
+    selections.clickedEdges = [];
+    selections.hoveredNodes = [];
+    selections.hoveredEdges = [];
+
+    if (selections.search != '') {
+      selections.searchResults = fuse.search(selections.search);
+    } else {
+      selections.searchResults = [];
+    }
+
+    var names = [];
+
+    for (i = 0; i < selections.searchResults.length; i++) {
+      names.push(selections.searchResults[i]['AuthorNames-Deduped'].split(';'))
+    }
+
+    names = names.flat();
+
+
+    for (i = 0; i < graph.nodes.length; i++) {
+      if (names.indexOf(graph.nodes[i].id) >= 0 && selections.clickedNodes.indexOf(graph.nodes[i]) < 0) {
+        selections.clickedNodes.push(graph.nodes[i])
+      }
+    }
+
+    for (i = 0; i < graph.links.length; i++) {
+      //console.log(graph.links[i].source);
+      if (selections.clickedEdges.indexOf(graph.links[i]) < 0) {
+        if (names.indexOf(graph.links[i].source.id) >= 0 && names.indexOf(graph.links[i].target.id) >= 0) {
+          selections.clickedEdges.push(graph.links[i])
+        }
+      }
+    }
+
+    //console.log(selections.clickedEdges);
+    
+    redraw();
+  })
+
+  dispatch.on('authorUnhighlighted.networkVis', function (selections) {
     div.transition()
       .duration(100)
       .style("opacity", 0);
 
     highlightedAuthor = null;
-    selectedNodes = [];
-    selectedEdges = [];
+    selections.hoveredNodes = [];
+    selections.hoveredEdges = [];
     redraw();
   });
 
-  dispatch.on('authorHighlighted.networkVis', function (d) {
+  dispatch.on('authorHighlighted.networkVis', function (d, selections) {
 
     div.transition()
       .duration(100)
@@ -39,23 +106,23 @@ const NetworkVis = (function (dispatch, projection) {
 
     var names = [];
 
-    highlightedAuthor = d;
-    selectedNodes.push(d);
+    selections.highlightedAuthor = d;
+    selections.hoveredNodes.push(d);
 
     for (i = 0; i < graph.links.length; i++) {
       if (graph.links[i].source.id == d.id) {
-        selectedEdges.push(graph.links[i])
+        selections.hoveredEdges.push(graph.links[i])
         names.push(graph.links[i].target.id)
       }
       if (graph.links[i].target.id == d.id) {
-        selectedEdges.push(graph.links[i])
+        selections.hoveredEdges.push(graph.links[i])
         names.push(graph.links[i].source.id)
       }
     }
 
     for (i = 0; i < graph.nodes.length; i++) {
       if (names.indexOf(graph.nodes[i].id) >= 0) {
-        selectedNodes.push(graph.nodes[i])
+        selections.hoveredNodes.push(graph.nodes[i])
       }
     }
 
@@ -64,36 +131,36 @@ const NetworkVis = (function (dispatch, projection) {
 
     redraw();
   });
-  
-  dispatch.on('authorUnClicked.networkVis', function () {
-    clickedAuthor = null;
-    clickedNodes = [];
-    clickedEdges = [];
+
+  dispatch.on('authorUnClicked.networkVis', function (selections) {
+    selections.clickedNodes = [];
+    selections.clickedEdges = [];
     redraw();
   });
 
-  dispatch.on('authorClicked.networkVis', function (d) {
+  dispatch.on('authorClicked.networkVis', function (d, selections) {
     var names = [];
 
-    clickedAuthor = d;
-    if (clickedNodes.indexOf(d) < 0){
-      clickedNodes.push(d);
+
+
+    if (selections.clickedNodes.indexOf(d) < 0) {
+      selections.clickedNodes.push(d);
     }
 
     for (i = 0; i < graph.links.length; i++) {
-      if (graph.links[i].source.id == d.id && clickedEdges.indexOf(graph.links[i]) < 0) {
-        clickedEdges.push(graph.links[i])
+      if (graph.links[i].source.id == d.id && selections.clickedEdges.indexOf(graph.links[i]) < 0) {
+        selections.clickedEdges.push(graph.links[i])
         names.push(graph.links[i].target.id)
       }
-      if (graph.links[i].target.id == d.id && clickedEdges.indexOf(graph.links[i]) < 0) {
-        clickedEdges.push(graph.links[i])
+      if (graph.links[i].target.id == d.id && selections.clickedEdges.indexOf(graph.links[i]) < 0) {
+        selections.clickedEdges.push(graph.links[i])
         names.push(graph.links[i].source.id)
       }
     }
 
     for (i = 0; i < graph.nodes.length; i++) {
       if (names.indexOf(graph.nodes[i].id) >= 0) {
-        clickedNodes.push(graph.nodes[i])
+        selections.clickedNodes.push(graph.nodes[i])
       }
     }
 
@@ -165,13 +232,13 @@ const NetworkVis = (function (dispatch, projection) {
       return color(name);
     })
     .on('mouseover', function (d) {
-      dispatch.call('authorHighlighted', this, d);
+      dispatch.call('authorHighlighted', this, d, selections);
     })
     .on('mouseout', function (d) {
-      dispatch.call('authorUnhighlighted', this);
+      dispatch.call('authorUnhighlighted', this, selections);
     })
     .on('click', function (d) {
-      dispatch.call('authorClicked', this, d);
+      dispatch.call('authorClicked', this, d, selections);
     })
     .call(d3.drag()
       .on("start", dragstarted)
@@ -191,11 +258,11 @@ const NetworkVis = (function (dispatch, projection) {
           return d.paperIndex.length >= 8 ? initials : '';
         });
     }
-    
-  d3.select('svg').on('dblclick', function (d) {
-      dispatch.call('authorUnClicked', this);
+
+    d3.select('svg').on('dblclick', function (d) {
+      dispatch.call('authorUnClicked', this, selections);
     })
-  
+
   });
 
   simulation
@@ -222,18 +289,18 @@ const NetworkVis = (function (dispatch, projection) {
 
     link
       .attr('stroke', d => {
-        if (selectedEdges.length == 0 && clickedEdges.length == 0) {
+        if (selections.hoveredEdges.length == 0 && selections.clickedEdges.length == 0) {
           return '#999'
-        } else if (selectedEdges.indexOf(d) >= 0 || clickedEdges.indexOf(d) >= 0) {
+        } else if (selections.hoveredEdges.indexOf(d) >= 0 || selections.clickedEdges.indexOf(d) >= 0) {
           return '#4f4544'
         } else {
           return '#999'
         }
       })
       .attr('stroke-opacity', d => {
-        if (selectedEdges.length == 0 && clickedEdges.length == 0) {
+        if (selections.hoveredEdges.length == 0 && selections.clickedEdges.length == 0) {
           return 0.2
-        } else if (selectedEdges.indexOf(d) >= 0 || clickedEdges.indexOf(d) >= 0) {
+        } else if (selections.hoveredEdges.indexOf(d) >= 0 || selections.clickedEdges.indexOf(d) >= 0) {
           return 0.6
         } else {
           return 0.0
@@ -253,9 +320,9 @@ const NetworkVis = (function (dispatch, projection) {
         return '#ccc';
       })
       .attr('opacity', d => {
-        if (selectedNodes.length == 0 && clickedNodes.length == 0) {
+        if (selections.hoveredNodes.length == 0 && selections.clickedNodes.length == 0) {
           return 1;
-        } else if (selectedNodes.indexOf(d) >= 0 || clickedNodes.indexOf(d) >= 0) {
+        } else if (selections.hoveredNodes.indexOf(d) >= 0 || selections.clickedNodes.indexOf(d) >= 0) {
           return 1;
         } else {
           return 0.1;
@@ -268,9 +335,9 @@ const NetworkVis = (function (dispatch, projection) {
           .attr('x', d.x)
           .attr('y', d.y)
           .attr('opacity', function () {
-            if (selectedNodes.length == 0) {
+            if (selections.hoveredNodes.length == 0 && selections.clickedNodes.length == 0) {
               return 1;
-            } else if (selectedNodes.indexOf(d) >= 0 || clickedNodes.indexOf(d) >= 0) {
+            } else if (selections.hoveredNodes.indexOf(d) >= 0 || selections.clickedNodes.indexOf(d) >= 0) {
               return 1;
             } else {
               return 0.1;
@@ -296,4 +363,29 @@ const NetworkVis = (function (dispatch, projection) {
     d.fx = null;
     d.fy = null;
   }
+
+  const searchBar = document.getElementById('searchBar');
+
+  searchBar.onkeyup = function () {
+    //console.log("keyup");
+    //selections.search = searchBar.value;
+    //dispatch.call('search', this, selections);
+  }
+  
+  function delay(callback, ms) {
+  var timer = 0;
+  return function() {
+    var context = this, args = arguments;
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      callback.apply(context, args);
+    }, ms || 0);
+  };
+}
+  
+  $('#searchBar').keyup(delay(function (e) {
+    selections.search = searchBar.value;
+    dispatch.call('search', this, selections);
+    }, 500));
+
 });
