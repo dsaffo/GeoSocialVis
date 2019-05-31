@@ -7,7 +7,7 @@
         .scale(250)
         .translate( [width / 2 - 50, height / 1.5]);
 
-    const dispatch = d3.dispatch("authorHighlighted", "authorUnhighlighted", "paperHighlighted");
+    const dispatch = d3.dispatch("authorHighlighted", "authorUnhighlighted", "paperHighlighted", "authorClicked", "authorUnClicked");
 
     const networkVis = NetworkVis(dispatch, projection);
     const panel = Panel(dispatch);
@@ -15,9 +15,8 @@
   
     $(function() {
     var $target = $('#papers');
-    $("body").mousewheel(function(event, delta) {
+    $(".nodes").mousewheel(function(event, delta) {
       $target.scrollTop($target.scrollTop() - (delta * 30));
-      event.preventDefault();
    });
 });
 })();

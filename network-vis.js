@@ -11,8 +11,11 @@ const NetworkVis = (function (dispatch, projection) {
     .style("opacity", 0);
 
   let highlightedAuthor = null;
+  let clickedAuthor = null;
   let selectedNodes = [];
   let selectedEdges = [];
+  let clickedNodes = [];
+  let clickedEdges = [];
 
   dispatch.on('authorUnhighlighted.networkVis', function () {
     div.transition()
@@ -58,6 +61,44 @@ const NetworkVis = (function (dispatch, projection) {
 
     //console.log(selectedNodes)
     //console.log(selectedEdges)
+
+    redraw();
+  });
+  
+  dispatch.on('authorUnClicked.networkVis', function () {
+    clickedAuthor = null;
+    clickedNodes = [];
+    clickedEdges = [];
+    redraw();
+  });
+
+  dispatch.on('authorClicked.networkVis', function (d) {
+    var names = [];
+
+    clickedAuthor = d;
+    if (clickedNodes.indexOf(d) < 0){
+      clickedNodes.push(d);
+    }
+
+    for (i = 0; i < graph.links.length; i++) {
+      if (graph.links[i].source.id == d.id && clickedEdges.indexOf(graph.links[i]) < 0) {
+        clickedEdges.push(graph.links[i])
+        names.push(graph.links[i].target.id)
+      }
+      if (graph.links[i].target.id == d.id && clickedEdges.indexOf(graph.links[i]) < 0) {
+        clickedEdges.push(graph.links[i])
+        names.push(graph.links[i].source.id)
+      }
+    }
+
+    for (i = 0; i < graph.nodes.length; i++) {
+      if (names.indexOf(graph.nodes[i].id) >= 0) {
+        clickedNodes.push(graph.nodes[i])
+      }
+    }
+
+    //console.log(clickedNodes)
+    //console.log(clickedEdges)
 
     redraw();
   });
@@ -129,6 +170,9 @@ const NetworkVis = (function (dispatch, projection) {
     .on('mouseout', function (d) {
       dispatch.call('authorUnhighlighted', this);
     })
+    .on('click', function (d) {
+      dispatch.call('authorClicked', this, d);
+    })
     .call(d3.drag()
       .on("start", dragstarted)
       .on("drag", dragged)
@@ -147,6 +191,11 @@ const NetworkVis = (function (dispatch, projection) {
           return d.paperIndex.length >= 8 ? initials : '';
         });
     }
+    
+  d3.select('svg').on('dblclick', function (d) {
+      dispatch.call('authorUnClicked', this);
+    })
+  
   });
 
   simulation
@@ -173,18 +222,18 @@ const NetworkVis = (function (dispatch, projection) {
 
     link
       .attr('stroke', d => {
-        if (selectedEdges == 0) {
+        if (selectedEdges.length == 0 && clickedEdges.length == 0) {
           return '#999'
-        } else if (selectedEdges.indexOf(d) >= 0) {
+        } else if (selectedEdges.indexOf(d) >= 0 || clickedEdges.indexOf(d) >= 0) {
           return '#4f4544'
         } else {
           return '#999'
         }
       })
       .attr('stroke-opacity', d => {
-        if (selectedEdges == 0) {
+        if (selectedEdges.length == 0 && clickedEdges.length == 0) {
           return 0.2
-        } else if (selectedEdges.indexOf(d) >= 0) {
+        } else if (selectedEdges.indexOf(d) >= 0 || clickedEdges.indexOf(d) >= 0) {
           return 0.6
         } else {
           return 0.0
@@ -204,9 +253,9 @@ const NetworkVis = (function (dispatch, projection) {
         return '#ccc';
       })
       .attr('opacity', d => {
-        if (selectedNodes.length == 0) {
+        if (selectedNodes.length == 0 && clickedNodes.length == 0) {
           return 1;
-        } else if (selectedNodes.indexOf(d) >= 0) {
+        } else if (selectedNodes.indexOf(d) >= 0 || clickedNodes.indexOf(d) >= 0) {
           return 1;
         } else {
           return 0.1;
@@ -221,7 +270,7 @@ const NetworkVis = (function (dispatch, projection) {
           .attr('opacity', function () {
             if (selectedNodes.length == 0) {
               return 1;
-            } else if (selectedNodes.indexOf(d) >= 0) {
+            } else if (selectedNodes.indexOf(d) >= 0 || clickedNodes.indexOf(d) >= 0) {
               return 1;
             } else {
               return 0.1;

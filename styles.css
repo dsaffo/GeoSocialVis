@@ -9,8 +9,8 @@
 }
 .slidecontainer {
     position: absolute;
-    top: 130px;
-    left: 600px;
+    top: 10px;
+    left: 20px;
     background: #fff;
     padding: 5pt 10pt;
     box-shadow: #ccc 0 0 5px;
