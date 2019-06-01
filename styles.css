@@ -1,3 +1,7 @@
+* {
+    box-sizing: border-box;
+}
+
 .linkss lines {
     stroke: #999;
     stroke-opacity: 0.2;
@@ -41,7 +45,7 @@
 #searchBar {
   width: 100%; 
   font-size: 16px; 
-  padding: 12px 0px 12px 0px; 
+  padding: 12px 8px;
   border: 1px solid #ddd; 
   margin-bottom: 12px; 
   border-radius: 8px;
@@ -84,4 +88,8 @@ div.tooltip {
 {
     background-color: #000000;
 
+}
+
+#papers > .list {
+    padding: 0;
 }
