@@ -7,7 +7,7 @@ const NetworkVis = (function (dispatch, projection) {
   const forceBalance = ForceBalance(projection);
   const simulation = forceBalance.simulation;
 
-  var div = d3.select("body").append("div")
+  const div = d3.select("body").append("div")
     .attr("class", "tooltip")
     .style("opacity", 0);
 
@@ -22,10 +22,9 @@ const NetworkVis = (function (dispatch, projection) {
     hoveredEdges: [],
     search: '',
     searchResults: []
-  }
+  };
 
-
-  var searchOptions = {
+  const searchOptions = {
     shouldSort: true,
     threshold: 0.1,
     tokenize: true,
@@ -41,7 +40,7 @@ const NetworkVis = (function (dispatch, projection) {
     ]
   };
 
-  var fuse = new Fuse(allPapers, searchOptions);
+  const fuse = new Fuse(allPapers, searchOptions);
 
   dispatch.on('search.networkVis', function (selections) {
     selections.highlightedAuthor = null;
@@ -50,28 +49,27 @@ const NetworkVis = (function (dispatch, projection) {
     selections.hoveredNodes = [];
     selections.hoveredEdges = [];
 
-    if (selections.search != '') {
+    if (selections.search !== '') {
       selections.searchResults = fuse.search(selections.search);
     } else {
       selections.searchResults = [];
     }
 
-    var names = [];
+    let names = [];
 
-    for (i = 0; i < selections.searchResults.length; i++) {
+    for (let i = 0; i < selections.searchResults.length; i++) {
       names.push(selections.searchResults[i]['AuthorNames-Deduped'].split(';'))
     }
 
     names = names.flat();
 
-
-    for (i = 0; i < graph.nodes.length; i++) {
+    for (let i = 0; i < graph.nodes.length; i++) {
       if (names.indexOf(graph.nodes[i].id) >= 0 && selections.clickedNodes.indexOf(graph.nodes[i]) < 0) {
         selections.clickedNodes.push(graph.nodes[i])
       }
     }
 
-    for (i = 0; i < graph.links.length; i++) {
+    for (let i = 0; i < graph.links.length; i++) {
       //console.log(graph.links[i].source);
       if (selections.clickedEdges.indexOf(graph.links[i]) < 0) {
         if (names.indexOf(graph.links[i].source.id) >= 0 && names.indexOf(graph.links[i].target.id) >= 0) {
@@ -83,7 +81,7 @@ const NetworkVis = (function (dispatch, projection) {
     //console.log(selections.clickedEdges);
     
     redraw();
-  })
+  });
 
   dispatch.on('authorUnhighlighted.networkVis', function (selections) {
     div.transition()
@@ -105,23 +103,23 @@ const NetworkVis = (function (dispatch, projection) {
       .style("left", (d3.event.pageX + 20) + "px")
       .style("top", (d3.event.pageY - 88) + "px");
 
-    var names = [];
+    const names = [];
 
     selections.highlightedAuthor = d;
     selections.hoveredNodes.push(d);
 
-    for (i = 0; i < graph.links.length; i++) {
-      if (graph.links[i].source.id == d.id) {
+    for (let i = 0; i < graph.links.length; i++) {
+      if (graph.links[i].source.id === d.id) {
         selections.hoveredEdges.push(graph.links[i])
         names.push(graph.links[i].target.id)
       }
-      if (graph.links[i].target.id == d.id) {
+      if (graph.links[i].target.id === d.id) {
         selections.hoveredEdges.push(graph.links[i])
         names.push(graph.links[i].source.id)
       }
     }
 
-    for (i = 0; i < graph.nodes.length; i++) {
+    for (let i = 0; i < graph.nodes.length; i++) {
       if (names.indexOf(graph.nodes[i].id) >= 0) {
         selections.hoveredNodes.push(graph.nodes[i])
       }
@@ -140,28 +138,26 @@ const NetworkVis = (function (dispatch, projection) {
   });
 
   dispatch.on('authorClicked.networkVis', function (d, selections) {
-    var names = [];
-
-
+    const names = [];
 
     if (selections.clickedNodes.indexOf(d) < 0) {
       selections.clickedNodes.push(d);
     }
 
     for (i = 0; i < graph.links.length; i++) {
-      if (graph.links[i].source.id == d.id && selections.clickedEdges.indexOf(graph.links[i]) < 0) {
-        selections.clickedEdges.push(graph.links[i])
-        names.push(graph.links[i].target.id)
+      if (graph.links[i].source.id === d.id && selections.clickedEdges.indexOf(graph.links[i]) < 0) {
+        selections.clickedEdges.push(graph.links[i]);
+        names.push(graph.links[i].target.id);
       }
-      if (graph.links[i].target.id == d.id && selections.clickedEdges.indexOf(graph.links[i]) < 0) {
-        selections.clickedEdges.push(graph.links[i])
-        names.push(graph.links[i].source.id)
+      if (graph.links[i].target.id === d.id && selections.clickedEdges.indexOf(graph.links[i]) < 0) {
+        selections.clickedEdges.push(graph.links[i]);
+        names.push(graph.links[i].source.id);
       }
     }
 
     for (i = 0; i < graph.nodes.length; i++) {
       if (names.indexOf(graph.nodes[i].id) >= 0) {
-        selections.clickedNodes.push(graph.nodes[i])
+        selections.clickedNodes.push(graph.nodes[i]);
       }
     }
 
@@ -257,11 +253,10 @@ const NetworkVis = (function (dispatch, projection) {
           return d.paperIndex.length >= 8 ? initials : '';
         });
     }
+  });
 
-    svg.on('dblclick', function (d) {
-      dispatch.call('authorUnClicked', this, selections);
-    })
-
+  svg.on('dblclick', function (d) {
+    dispatch.call('authorUnClicked', this, selections);
   });
 
   simulation
@@ -271,7 +266,6 @@ const NetworkVis = (function (dispatch, projection) {
     .links(graph.links);
 
   function redraw() {
-
     link
       .attr("x1", function (d) {
         return d.source.x;
@@ -288,7 +282,7 @@ const NetworkVis = (function (dispatch, projection) {
 
     link
       .attr('stroke', d => {
-        if (selections.hoveredEdges.length == 0 && selections.clickedEdges.length == 0) {
+        if(selections.hoveredEdges.length === 0 && selections.clickedEdges.length === 0) {
           return '#999'
         } else if (selections.hoveredEdges.indexOf(d) >= 0 || selections.clickedEdges.indexOf(d) >= 0) {
           return '#4f4544'
@@ -297,7 +291,7 @@ const NetworkVis = (function (dispatch, projection) {
         }
       })
       .attr('stroke-opacity', d => {
-        if (selections.hoveredEdges.length == 0 && selections.clickedEdges.length == 0) {
+        if(selections.hoveredEdges.length === 0 && selections.clickedEdges.length === 0) {
           return 0.2
         } else if (selections.hoveredEdges.indexOf(d) >= 0 || selections.clickedEdges.indexOf(d) >= 0) {
           return 0.6
@@ -319,7 +313,7 @@ const NetworkVis = (function (dispatch, projection) {
         return '#ccc';
       })
       .attr('opacity', d => {
-        if (selections.hoveredNodes.length == 0 && selections.clickedNodes.length == 0) {
+        if(selections.hoveredNodes.length === 0 && selections.clickedNodes.length === 0) {
           return 1;
         } else if (selections.hoveredNodes.indexOf(d) >= 0 || selections.clickedNodes.indexOf(d) >= 0) {
           return 1;
@@ -329,12 +323,12 @@ const NetworkVis = (function (dispatch, projection) {
       });
 
     graph.nodes.forEach(d => {
-      if (d.textEl) {
+      if(d.textEl) {
         d.textEl
           .attr('x', d.x)
           .attr('y', d.y)
           .attr('opacity', function () {
-            if (selections.hoveredNodes.length == 0 && selections.clickedNodes.length == 0) {
+            if(selections.hoveredNodes.length === 0 && selections.clickedNodes.length === 0) {
               return 1;
             } else if (selections.hoveredNodes.indexOf(d) >= 0 || selections.clickedNodes.indexOf(d) >= 0) {
               return 1;
@@ -369,22 +363,21 @@ const NetworkVis = (function (dispatch, projection) {
     //console.log("keyup");
     //selections.search = searchBar.value;
     //dispatch.call('search', this, selections);
-  }
+  };
   
   function delay(callback, ms) {
-  var timer = 0;
-  return function() {
-    var context = this, args = arguments;
-    clearTimeout(timer);
-    timer = setTimeout(function () {
-      callback.apply(context, args);
-    }, ms || 0);
-  };
-}
+    let timer = 0;
+    return function() {
+      var context = this, args = arguments;
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        callback.apply(context, args);
+      }, ms || 0);
+    };
+  }
   
   $('#searchBar').keyup(delay(function (e) {
     selections.search = searchBar.value;
     dispatch.call('search', this, selections);
-    }, 500));
-
+  }, 500));
 });
