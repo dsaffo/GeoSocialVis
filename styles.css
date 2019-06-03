@@ -20,15 +20,6 @@
     box-shadow: #ccc 0 0 5px;
     border-radius: 5px;
 }
-#map-background {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -10;
-    background: url('./map.png') 6px 6px no-repeat;
-}
 
 .panel {
     background: #eee;
@@ -92,4 +83,10 @@ div.tooltip {
 
 #papers > .list {
     padding: 0;
+}
+
+.map path {
+    fill: #eee;
+    stroke: #ccc;
+    stroke-width: 0.3;
 }

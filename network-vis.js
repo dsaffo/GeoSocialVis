@@ -2,6 +2,7 @@ const NetworkVis = (function (dispatch, projection) {
   const svg = d3.select("svg"),
     width = +svg.attr("width"),
     height = +svg.attr("height");
+  const vis = svg.select('.network');
 
   const forceBalance = ForceBalance(projection);
   const simulation = forceBalance.simulation;
@@ -170,8 +171,6 @@ const NetworkVis = (function (dispatch, projection) {
     redraw();
   });
 
-  const path = d3.geoPath().projection(projection);
-
   const affiliationsWithLocation = affiliations
     .filter(a => a.Position);
   for (const affiliation of affiliationsWithLocation) {
@@ -184,7 +183,7 @@ const NetworkVis = (function (dispatch, projection) {
     affiliationsByName[affiliation.Name] = affiliation;
   }
 
-  svg.append('g')
+  vis.append('g')
     .attr('class', 'affiliations')
     .selectAll('circle')
     .data(affiliationsWithLocation)
@@ -204,7 +203,7 @@ const NetworkVis = (function (dispatch, projection) {
 
   graph.nodes.sort((a, b) => a.paperIndex.length - b.paperIndex.length);
 
-  const link = svg.append("g")
+  const link = vis.append("g")
     .attr("class", "links")
     .selectAll("line")
     .data(graph.links)
@@ -215,7 +214,7 @@ const NetworkVis = (function (dispatch, projection) {
     .attr('stroke', '#999')
     .attr('stroke-opacity', 0.2);
 
-  const nodesG = svg.append("g")
+  const nodesG = vis.append("g")
     .attr("class", "nodes");
 
   const node = nodesG
@@ -259,7 +258,7 @@ const NetworkVis = (function (dispatch, projection) {
         });
     }
 
-    d3.select('svg').on('dblclick', function (d) {
+    svg.on('dblclick', function (d) {
       dispatch.call('authorUnClicked', this, selections);
     })
 

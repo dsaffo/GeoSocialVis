@@ -48,7 +48,7 @@ const ForceBalance = (function(projection){
         forceSettings = forceSelection(this.value);
         applyStrengths(forceSettings);
 
-        document.getElementById('map-background').style.opacity = forceSettings.mapOpacity;
+        svg.select('.map').attr('opacity', forceSettings.mapOpacity);
     };
 
     const  simulation = d3.forceSimulation().alphaDecay(0.02);

@@ -11,7 +11,7 @@
 
     const networkVis = NetworkVis(dispatch, projection);
     const panel = Panel(dispatch);
-  
+    const map = AtlasMap(projection);
   
     $(function() {
     var $target = $('#papers');
