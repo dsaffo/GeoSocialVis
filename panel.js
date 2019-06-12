@@ -11,6 +11,54 @@ const Panel = (function (dispatch) {
 
   let papers = []
 
+  var names = ['Frank', 'Tom', 'Peter', 'Mary'];
+
+  var ul = d3.select('.list');
+
+
+
+  function paperListAdd(list) {
+    
+    ul.append('h3').attr('id', 'paperCount').text(list.length + " Publications")
+    
+    ul.selectAll('li')
+      .data(list)
+      .enter()
+      .append('li')
+      .append('h3')
+      .append('a')
+      .text(function(d){return d.Title + ", " + d.Year})
+      .attr('href', function(d){return d.Link})
+      .attr('target', "_blank")
+    
+    ul.selectAll('li')
+      .append('h4')
+      .text(function(d){return d.Year + " Citations Aminer: " + d['AminerCitationCount_02-2019'] + " Xplore: " + d['XPloreCitationCount_02-2019']})
+      
+    ul.selectAll('li')
+      .append('h4')
+      .text(function(d){
+       let authors = ""
+       let authorsList = d['AuthorNames-Deduped'].split(";")
+       for (let i = 0; i < authorsList.length; i++){
+         if (i == authorsList.length - 1){
+           authors += authorsList[i]
+         }
+         else{
+           authors += authorsList[i] + ", "
+         }
+         
+       }
+       
+       return authors;
+      });
+  }
+  
+  function paperListRemove() {
+    ul.selectAll('#paperCount').remove();
+    ul.selectAll('li').remove();
+  }
+
   dispatch.on('authorHighlighted.panel', function (author, selections) {
 
     if (selections.clickedNodes.length == 0) {
@@ -19,8 +67,9 @@ const Panel = (function (dispatch) {
       for (i = 0; i < author.paperIndex.length; i++) {
         papers.push(allPapers[author.paperIndex[i]]);
       }
-
-      paperList.add(papers.reverse());
+      
+      paperListAdd(papers);
+      
     }
 
   });
@@ -28,7 +77,7 @@ const Panel = (function (dispatch) {
   dispatch.on('authorUnhighlighted.panel', function (selections) {
     if (selections.clickedNodes.length == 0) {
       papers = []
-      paperList.clear();
+      paperListRemove();
     }
   });
 
@@ -41,8 +90,8 @@ const Panel = (function (dispatch) {
         }
       }
 
-      paperList.clear();
-      paperList.add(papers);
+      paperListRemove();
+      paperListAdd(papers);
     }
   })
 
@@ -50,14 +99,14 @@ const Panel = (function (dispatch) {
     papers = []
     paperList.clear();
   })
-  
+
   dispatch.on('search.panel', function (selections) {
-    if (selections.search == ''){
+    if (selections.search == '') {
       papers = []
-      paperList.clear();
-    }else{
-      paperList.clear();
-      paperList.add(selections.searchResults);
+      paperListRemove();
+    } else {
+      paperListRemove();
+      paperListAdd(selections.searchResults);
     }
   })
 
