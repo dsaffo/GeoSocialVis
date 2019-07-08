@@ -1,1 +1,1 @@
-# PubAtlas
+# GeoSocialVis
