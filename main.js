@@ -1,10 +1,10 @@
 (function(){
     const svg = d3.select("svg");
     
-    let w = window.innerWidth * 0.8;
-    let h = window.innerHeight;
+  //  let w = window.innerWidth * 0.8;
+    // let h = window.innerHeight;
     
-    svg.attr("width", w).attr("height",h);
+    //svg.attr("width", w).attr("height",h);
     
     const  width = +svg.attr("width"),
         height = +svg.attr("height");
